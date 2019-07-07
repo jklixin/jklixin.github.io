@@ -297,20 +297,25 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
            name：package的名称，用来多个package的区分 
            namespace：命名空间 默认为/ ，如果namespace=&quot;/e&quot;，则访问路径为localhost/HelloAction/e/hello
         extends：属性固定值，默认struts-default
- --&gt;
+     --&gt;
 
 &lt;package name=&quot;demo&quot; extends=&quot;struts-default&quot; namespace=&quot;/&quot;&gt;
 
-&lt;!--action中 
-    method默认执行execute方法
-     class =包+.类名
-      通过name访问
- --&gt;
+        &lt;!--action中 
+            method默认执行execute方法
+             class =包+.类名
+              通过name访问
+         --&gt;
+
         &lt;action name=&quot;hello&quot; class=&quot;com.lx.demo.helloAction&quot; method=&quot;&quot;&gt;
-        &lt;!--result中
-            name与method指定方法的返回值一致
-            默认的name值是“success
-              type:配置如何到另外一个路径中去（转发或者重定向）默认为转发 --&gt;
+
+            &lt;!--    
+                result中
+                name与method指定方法的返回值一致
+                默认的name值是“success
+                  type:配置如何到另外一个路径中去（转发或者重定向）默认为转发 
+            --&gt;
+
             &lt;result name=&quot;ok&quot;&gt;/index.jsp&lt;/result&gt;    
         &lt;/action&gt;
 &lt;/package&gt;
@@ -320,11 +325,33 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
         &lt;result name=&quot;log&quot;&gt;/test.jsp&lt;/result&gt;
     &lt;/action&gt;
 &lt;/package&gt;
+
 &lt;!--覆盖系统默认常量(libraties下struts2-core-2.5.20.jar包里面的
     org.apache.struts2里的default,properties)  --&gt;
+
 &lt;constant name=&quot;struts.i18n.encoding &quot; value=&quot;GBk&quot;&gt;&lt;/constant&gt;
 &lt;/struts&gt;
-</code></pre><p><strong>模块化struts.xml文件的方法</strong></p>
+</code></pre><p><strong>总结</strong>：</p>
+<ol>
+<li><p><code>&lt;package&gt;</code>标签，如果要配置<Action>的标签，那么必须要先配置<package>标签，代表的包的概念</p>
+<ul>
+<li>包含的属性<ul>
+<li><code>name</code>                  — 包的名称，要求是唯一的，管理action配置</li><li><code>extends</code>               — 继承，可以继承其他的包，只要继承了，那么该包就包含了其他包的功能，一般都是继承struts-default</li><li><code>namespace</code>             — 名称空间，一般与<action>标签中的name属性共同决定访问路径（通俗话：怎么来访问action），常见的配置如下<ul>
+<li>namespace=”/“     — 根名称空间</li><li>namespace=”/aaa”  — 带有名称的名称空间</li></ul>
+</li><li><code>abstract</code>              — 抽象的。这个属性基本很少使用，值如果是true，那么编写的包是被继承的</li></ul>
+</li></ul>
+</li><li><p><code>&lt;action&gt;</code>标签</p>
+<ul>
+<li>代表配置action类，包含的属性<ul>
+<li><code>name</code>          — 和<package>标签的namespace属性一起来决定访问路径的</li><li><code>class</code>         — 配置Action类的全路径（默认值是ActionSupport类）</li><li><code>method</code>        — Action类中执行的方法，如果不指定，默认值是execute</li></ul>
+</li></ul>
+</li><li><p><code>&lt;result&gt;</code>标签</p>
+<ul>
+<li>action类中方法执行，返回的结果跳转的页面<ul>
+<li><code>name</code>      — 结果页面逻辑视图名称</li><li><code>type</code>      — 结果类型（默认值是转发，也可以设置其他的值）</li></ul>
+</li></ul>
+</li></ol>
+<p><strong>模块化struts.xml文件的方法</strong></p>
 <ul>
 <li>文件拆分为多个xml文件，并用以下方式导入它们</li></ul>
 <pre><code>&lt;struts&gt;
@@ -339,7 +366,8 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
         &lt;allowed-methods&gt;add,delete&lt;/allowed-methods&gt;
     &lt;/action&gt;
 &lt;/package&gt;
-</code></pre><h1 id="action">Action</h1>
+</code></pre><hr>
+<h1 id="action">Action</h1>
 <p><strong>自定义Action一般继承ActionSupport类</strong></p>
 <ul>
 <li>Action访问Servlet-API </li></ul>
@@ -353,6 +381,7 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
  HttpParameters parameters = context.getParameters();
  Parameter parameter = parameters.get(&quot;sid&quot;);
 </code></pre></li></ol>
+<hr>
 <h1 id="-">拦截器</h1>
 <p>拦截器实现以下操作：</p>
 <ul>
@@ -361,9 +390,42 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 <li>在调用action后提供后处理逻辑。</li></ul>
 <ul>
 <li>捕获异常，以便可以执行备用处理。</li></ul>
-<p><strong>自定义拦截器</strong></p>
+<h4 id="-">自定义拦截器</h4>
 <ol>
-<li>实现<code>com.opensyphony.xwork.interceptor.interceptor</code></li><li>继承<code>com.opensyphony.xwork.interceptor.AbstractInterceptor</code></li><li>在struts.xml中注册拦截器</li><li></li><li>如果某个Action有制定拦截器，默认拦截器将无效</li></ol>
+<li>实现<code>com.opensyphony.xwork.interceptor.interceptor</code></li><li>继承<code>com.opensyphony.xwork.interceptor.AbstractInterceptor</code></li><li>根据具体需要<strong>重写intercepter方法</strong></li><li>在struts.xml中注册拦截器</li><li>如果某个Action有制定拦截器，默认拦截器将无效<br>方式一：</li></ol>
+<pre><code>&lt;interceptors&gt;
+   &lt;interceptor name=&quot;DemoInterceptor&quot; class=&quot;com.itheima.interceptor.DemoInterceptor&quot;/&gt;
+&lt;/interceptors&gt;
+
+&lt;action name=&quot;userAction&quot; class=&quot;com.itheima.demo3.UserAction&quot;&gt;
+   &lt;!-- 只要是引用自己的拦截器，默认栈的拦截器就不执行了，必须要手动引入默认栈 --&gt;
+   &lt;interceptor-ref name=&quot;DemoInterceptor&quot;/&gt;
+   &lt;interceptor-ref name=&quot;defaultStack&quot;/&gt;
+&lt;/action&gt;
+</code></pre><p>方式二：</p>
+<pre><code>&lt;interceptors&gt;
+    &lt;interceptor name=&quot;DemoInterceptor&quot; class=&quot;com.itheima.interceptor.DemoInterceptor&quot;/&gt;
+    &lt;!-- 定义拦截器栈 --&gt;
+    &lt;interceptor-stack name=&quot;myStack&quot;&gt;
+        &lt;interceptor-ref name=&quot;DemoInterceptor&quot;/&gt;
+        &lt;interceptor-ref name=&quot;defaultStack&quot;/&gt;
+    &lt;/interceptor-stack&gt;
+&lt;/interceptors&gt;
+
+&lt;action name=&quot;userAction&quot; class=&quot;com.itheima.demo3.UserAction&quot;&gt;
+
+    &lt;!-- 引入拦截器栈 --&gt;
+    &lt;interceptor-ref name=&quot;myStack&quot;/&gt;
+&lt;/action&gt;
+</code></pre><blockquote>
+<p><strong>思考1</strong>：如果package有100个action,其中98个需要用到某个拦截器，怎么办?<br>可以将该拦截器和默认拦截器栈添加到自己定义的拦截器栈(<em>方法二</em>)，并且定义为默认拦截器栈<code>&lt;default-interceptor-ref name = &quot;myStack&quot;&gt;</code></p>
+<p><strong>思考2</strong>：按照上述解决方法，那剩余两个不用该拦截器却使用了该拦截器，这个时候怎么办？<br>给这两个单独加自己的拦截器，这样会覆盖之前定义的默认拦截器栈myStack,一般误其他要求引入<code>defaultStack</code>就好，也就是加上这行代码<br><code>&lt;interceptor-ref name = &quot;defaultStack&quot; /&gt;</code></p>
+</blockquote>
+<h4 id="-">方法拦截器</h4>
+<ul>
+<li>拦截器继承<code>MethodFilterInterceptor</code>类</li><li>细化到拦截某个<strong>方法</strong>，而不是某个<strong>Action</strong></li><li>指定需拦截或无需拦截的方法，在<interceptor-ref>标签里加入代码</li></ul>
+<ol>
+<li><code>&lt;param name = &quot;excludeMethods&quot;&gt;方法名&lt;/param&gt;</code><br>多个方法用逗号隔开，指明拦截器不要拦截的方法</li><li><code>&lt;param name = &quot;includeMethods&quot;&gt;方法名&lt;/param&gt;</code><br>指明所要拦截的方法<br>注意：includeMethod优先于excludeMethod</li></ol>
 <h1 id="ongl-">ONGL、值栈、标签库</h1>
 
 </body>
