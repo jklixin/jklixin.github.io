@@ -14,7 +14,7 @@
 	output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; } /* body
 ================================================*/ body { font-family: 'microsoft yahei', Helvetica, arial, freesans, clean, sans-serif; font-size: 14px; line-height: 1.8; /*color: #333;*/ color: #3f3f3f; background-color: #fff; padding: 20px; max-width: 960px; margin: 0 auto; max-width: 1000px; word-break: break-word !important; word-break: break-all; margin-left: 20px; margin-bottom: 100px; } body>*:first-child { margin-top: 0 !important; } body>*:last-child { margin-bottom: 0 !important; } /* blocks
 ============================================*/ p, blockquote, ul, ol, dl, table, pre { margin: 15px 0; } /* headers
-============================================*/ h1, h2, h3, h4, h5, h6 { font-family: Simsun, 'Microsoft YaHei', SimHei, Arial; margin: 20px 0 10px; padding: 0; font-weight: bold; -webkit-font-smoothing: antialiased; } h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt,
+============================================*/ h1, h2, h3, h4, h5, h6 { font-family: 'Microsoft YaHei',Simsun,  SimHei, Arial; margin: 20px 0 10px; padding: 0; font-weight: bold; -webkit-font-smoothing: antialiased; } h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt,
 	h5 code, h6 tt, h6 code { font-size: inherit; } h1 { font-size: 26px; color: #000; } h2 { font-size: 24px; border-bottom: 2px solid #3F3F3F; color: #000;  -webkit-font-smoothing: antialiased; } h3 { font-size: 22px;  -webkit-font-smoothing: antialiased; } h4 { font-size: 20px; } h5 { font-size: 18px; } h6 { color: #777; font-size: 16px; } body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child,
 	body>h4:first-child, body>h5:first-child, body>h6:first-child { margin-top: 0; padding-top: 0; } a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4,
 	a:first-child h5, a:first-child h6 { margin-top: 0; padding-top: 0; } h1+p, h2+p, h3+p, h4+p, h5+p, h6+p { margin-top: 10px; } /* links
@@ -287,7 +287,7 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 </head>
 <body>
 <h1 id="-">配置文件</h1>
-<p><strong>struts.xml文件</strong></p>
+<h4 id="-struts-xml-">一、struts.xml文件</h4>
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE struts PUBLIC
 &quot;-//Apache Software Foundation//DTD Struts Configuration 2.5//EN&quot;
@@ -331,8 +331,7 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 
 &lt;constant name=&quot;struts.i18n.encoding &quot; value=&quot;GBk&quot;&gt;&lt;/constant&gt;
 &lt;/struts&gt;
-</code></pre><p><strong>总结</strong>：</p>
-<ol>
+</code></pre><ol>
 <li><p><code>&lt;package&gt;</code>标签，如果要配置<Action>的标签，那么必须要先配置<package>标签，代表的包的概念</p>
 <ul>
 <li>包含的属性<ul>
@@ -351,14 +350,15 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 <li><code>name</code>      — 结果页面逻辑视图名称</li><li><code>type</code>      — 结果类型（默认值是转发，也可以设置其他的值）</li></ul>
 </li></ul>
 </li></ol>
-<p><strong>模块化struts.xml文件的方法</strong></p>
+<h4 id="-struts-xml-">二、模块化struts.xml文件的方法</h4>
 <ul>
 <li>文件拆分为多个xml文件，并用以下方式导入它们</li></ul>
 <pre><code>&lt;struts&gt;
     &lt;include file=&quot;com/lx/frist/test/struts-pay.xml&quot;&gt;&lt;/include&gt;
     &lt;include file=&quot;com/lx/second/test/struts-user.xml&quot;&gt;&lt;/include&gt;
 &lt;/struts&gt;
-</code></pre><p><strong>通配符实现</strong><br>访问时用<code>http://localhost/HelloAction/p/user_add</code></p>
+</code></pre><h4 id="-">三、通配符实现</h4>
+<p>访问时用<code>http://localhost/HelloAction/p/user_add</code></p>
 <pre><code>&lt;package name=&quot;Pay&quot; extends=&quot;struts-default&quot; namespace=&quot;/p&quot;&gt;
     &lt;action name=&quot;user_*&quot; class=&quot;com.lx.frist.test.PayAction&quot; method=&quot;{1}&quot; &gt;
         &lt;result name=&quot;add&quot;&gt;/index.jsp&lt;/result&gt;
@@ -366,7 +366,13 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
         &lt;allowed-methods&gt;add,delete&lt;/allowed-methods&gt;
     &lt;/action&gt;
 &lt;/package&gt;
-</code></pre><hr>
+</code></pre><h4 id="-">四、注意</h4>
+<p><strong>配置xml文件时需要极其非常一定要注意的点：</strong></p>
+<blockquote>
+<ol>
+<li><code>&lt;package&gt;</code>标签的<strong>namespace</strong>在访问时需要用到，很重要</li><li><code>&lt;action&gt;</code>标签的method方法默认执行execute方法 </br>如果表单要提交的方法不是execute,而是其他方法，如：在<code>&lt;form&gt;</code>标签里配置的action是login.action，<br><code>&lt;form action=&quot;&lt;%=request.getContextPath() %&gt;/login.action &quot;&gt;</code>而xml里name为login的这个action没有给method赋值，此时将会出现404<code>There is no Action mapped for namespace [/u] and action name [login] associated with context path [/HelloAction].</code>也就是说<strong>如果需要该action执行的方法不是execute方法，那么一定要将真正需要执行的方法名赋值给method</strong></li><li>用通配符访问需要注意向Action类里面添加方法或者修改方法名后，一定要<code>&lt;allowed-methods&gt;</code>标签里添加该方法，不然又会出现404</li></ol>
+</blockquote>
+<hr>
 <h1 id="action">Action</h1>
 <p><strong>自定义Action一般继承ActionSupport类</strong></p>
 <ul>
@@ -390,7 +396,7 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 <li>在调用action后提供后处理逻辑。</li></ul>
 <ul>
 <li>捕获异常，以便可以执行备用处理。</li></ul>
-<h4 id="-">自定义拦截器</h4>
+<h4 id="-">一、自定义拦截器</h4>
 <ol>
 <li>实现<code>com.opensyphony.xwork.interceptor.interceptor</code></li><li>继承<code>com.opensyphony.xwork.interceptor.AbstractInterceptor</code></li><li>根据具体需要<strong>重写intercepter方法</strong></li><li>在struts.xml中注册拦截器</li><li>如果某个Action有制定拦截器，默认拦截器将无效<br>方式一：</li></ol>
 <pre><code>&lt;interceptors&gt;
@@ -421,12 +427,160 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 <p><strong>思考1</strong>：如果package有100个action,其中98个需要用到某个拦截器，怎么办?<br>可以将该拦截器和默认拦截器栈添加到自己定义的拦截器栈(<em>方法二</em>)，并且定义为默认拦截器栈<code>&lt;default-interceptor-ref name = &quot;myStack&quot;&gt;</code></p>
 <p><strong>思考2</strong>：按照上述解决方法，那剩余两个不用该拦截器却使用了该拦截器，这个时候怎么办？<br>给这两个单独加自己的拦截器，这样会覆盖之前定义的默认拦截器栈myStack,一般误其他要求引入<code>defaultStack</code>就好，也就是加上这行代码<br><code>&lt;interceptor-ref name = &quot;defaultStack&quot; /&gt;</code></p>
 </blockquote>
-<h4 id="-">方法拦截器</h4>
+<h4 id="-">二、方法拦截器</h4>
 <ul>
 <li>拦截器继承<code>MethodFilterInterceptor</code>类</li><li>细化到拦截某个<strong>方法</strong>，而不是某个<strong>Action</strong></li><li>指定需拦截或无需拦截的方法，在<interceptor-ref>标签里加入代码</li></ul>
 <ol>
 <li><code>&lt;param name = &quot;excludeMethods&quot;&gt;方法名&lt;/param&gt;</code><br>多个方法用逗号隔开，指明拦截器不要拦截的方法</li><li><code>&lt;param name = &quot;includeMethods&quot;&gt;方法名&lt;/param&gt;</code><br>指明所要拦截的方法<br>注意：includeMethod优先于excludeMethod</li></ol>
+<hr>
 <h1 id="ongl-">ONGL、值栈、标签库</h1>
+<p><strong>前提：</strong><code>&lt;%@ taglib prefix=&quot;s&quot; uri=&quot;/struts-tags&quot; %&gt;</code></p>
+<h4 id="ongl-">ONGL\标签库</h4>
+<p><a href="https://blog.csdn.net/shaonianbz/article/details/79145925">https://blog.csdn.net/shaonianbz/article/details/79145925</a></p>
+<h4 id="-">值栈</h4>
+<p><a href="https://blog.csdn.net/shaonianbz/article/details/79183725">https://blog.csdn.net/shaonianbz/article/details/79183725</a></p>
+<hr>
+<h1 id="-">文件上传，下载</h1>
+<h4 id="-">一、文件上传</h4>
+<ol>
+<li>文件上传配置</li></ol>
+<ul>
+<li><p>文件上传条件：<br>  (1)用<strong>post</strong>方式<br>  (2)使用二进制编码：<strong>multipart/form-data</strong><br>  (3)<code>&lt;input type=&quot;file&quot; name=&quot;***&quot; /&gt;</code></p>
+<pre><code>&lt;form action=&quot;upload&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;
+         &lt;label for=&quot;myFile&quot;&gt;Upload your file&lt;/label&gt;
+         &lt;input type=&quot;file&quot; name=&quot;myFile&quot; /&gt;
+         &lt;input type=&quot;submit&quot; value=&quot;Upload&quot;/&gt;
+  &lt;/form&gt;
+</code></pre></li></ul>
+<ul>
+<li>上传文件默认为2M,可以通过修改常量设置,如：<code>&lt;constant name=&quot;struts.multipart.maxSize&quot; value=&quot;1000000&quot; /&gt;</code></li></ul>
+<ul>
+<li><p>如果只想对当前form表单有效，可以设置fileUpload拦截器属性</p>
+<pre><code> &lt;action name=&quot;upload&quot; class=&quot;cn.w3cschool.struts2.uploadFile&quot;&gt;
+    &lt;interceptor-ref name=&quot;basicStack&quot;&gt;
+    &lt;interceptor-ref name=&quot;fileUpload&quot;&gt;
+         &lt;param name=&quot;maximumSize&quot;&gt;20971520&lt;/param&gt;&lt;!-- 文件最大20m --&gt;
+            &lt;param name=&quot;allowedTypes&quot;&gt;image/jpeg,image/gif&lt;/param&gt;
+     &lt;!--设置上传文件允许的后缀名,多个使用逗号隔开  --&gt;
+           &lt;param name=&quot;allowedExtensions&quot;&gt;&lt;/param&gt;
+    &lt;/interceptor-ref&gt;
+    &lt;result name=&quot;success&quot;&gt;/success.jsp&lt;/result&gt;
+    &lt;result name=&quot;error&quot;&gt;/error.jsp&lt;/result&gt;
+  &lt;/action&gt;
+</code></pre></li></ul>
+<p>还可以设置上传文件允许的后缀名,多个使用逗号隔开如： <code>&lt;param name=&quot;allowedExtensions&quot;&gt;txt,avi&lt;/param&gt;</code></p>
+<ul>
+<li>关于限制文件大小，如果限制的最大值超过2M则需要在struts.xml中增加<code>&lt;constant name=&quot;struts.multipart.maxSize&quot; value=&quot;21000000&quot;/&gt;</code>，这行代码表示整个项目所有要上传文件的地方允许上传的文件大小的最大值，也就是说这个项目里上传的任何单个文件大小不能超过21000000字节（约20M），如果项目中不添加这行代码，则默认允许上传的文件大小最大为2M，</li><li>超过文件总大小时，跳转Input，</li></ul>
+<p>2 . action类代码需要注意的是：<br>（1）上传文件名命名规则：上传的字段名（form表单中的input的name）+FileName<br>（2）MIME类型命名规则：上传的字段名（form表单中的input的name）+ContentType<br>（3）表单中提供的属性和struts提供的属性需要set,get方法<br>（4）注意需要导入包，如下</p>
+<pre><code>import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.struts2.ServletActionContext;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+public class PayAction extends ActionSupport {
+
+private File myFile;
+private String myFileFileName;
+private String myFileNameContentType;
+
+@Override
+public String execute() {
+    System.out.println(&quot;进入pay&quot;);
+    return SUCCESS;
+}
+
+public String addd() {
+    System.out.println(&quot;add&quot;);
+    return &quot;add&quot;;
+}
+
+public String delete() {
+    System.out.println(&quot;delete&quot;);
+    return &quot;delete&quot;;        
+}
+
+ public String upload(){
+        //获取项目部署到的磁盘绝对路径
+        String realPath = ServletActionContext.getServletContext().getRealPath(&quot;/&quot;);
+        System.out.println(realPath+&quot;dahfo&quot;);
+        //指定目录创建文件
+        File destFile = new File(realPath, myFileFileName);
+        //复制到指定目录的文件
+        try {
+            FileUtils.copyFile(myFile,destFile);
+            myFile.delete();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return &quot;fail&quot;;
+        }
+
+        return &quot;ok&quot;;
+ }
+
+ public File getMyFile() {
+        return myFile;
+    }
+
+    public void setMyFile(File myFile) {
+        this.myFile = myFile;
+    }
+
+    public String getMyFileFileName() {
+        return myFileFileName;
+    }
+
+    public void setMyFileFileName(String myFileFileName) {
+        this.myFileFileName = myFileFileName;
+    }
+
+    public String getMyFileNameContentType() {
+        return myFileNameContentType;
+    }
+
+    public void setMyFileNameContentType(String myFileNameContentType) {
+        this.myFileNameContentType = myFileNameContentType;
+    }
+}
+</code></pre><h4 id="-">二、文件下载</h4>
+<ul>
+<li>xml配置</li></ul>
+<pre><code>&lt;package name=&quot;p2&quot; extends=&quot;struts-default&quot;&gt; 
+    &lt;action name=&quot;download&quot; class=&quot;com.san.action.Download&quot; method=&quot;download&quot;&gt;
+         &lt;!--stream类型:直接向页面输出二进制数据 --&gt; 
+        &lt;result name=&quot;ok&quot; type=&quot;stream&quot;&gt;
+         &lt;!-- 给stream结果视图注入参数:Content-Type --&gt;
+         &lt;param name=&quot;contentType&quot;&gt;application/octet-stream&lt;/param&gt;
+         &lt;!-- 告知浏览器一什么方式打开 ${@java.net.URLEncoder@encode(fileName,&quot;UTF-8&quot;)}--&gt; 
+        &lt;param name=&quot;contentDisposition&quot;&gt;attachment;fileName=1.jpg&lt;/param&gt; 
+        &lt;!-- 注入字节流，取值要写动作类中的set方法名称，首字母改成小写 --&gt; 
+        &lt;param name=&quot;inputName&quot;&gt;inputStream&lt;/param&gt; &lt;/result&gt;
+     &lt;/action&gt; 
+&lt;/package&gt;
+</code></pre><ul>
+<li>action核心代码</li></ul>
+<pre><code>public String download() throws Exception{ 
+    //1、找到文件存储位置 
+    String filePath=ServletActionContext.getServletContext().getRealPath(&quot;/WEB-INF/download/file1.txt&quot;); 
+
+    file = new File(filepath,fileName);
+    //2、把文件读入到InputStream流中 
+    inputStream=new FileInputStream(file);  
+    return &quot;ok&quot;; 
+    }
+ public InputStream getInputStream() {
+     return inputStream; 
+    }
+</code></pre><ul>
+<li><p>jsp文件，开头引入标签库<code>&lt;%@ taglib prefix=&quot;s&quot; uri=&quot;/struts-tags&quot; %&gt;</code></p>
+<pre><code>  &lt;s:a namespace=&quot;/p&quot; action=&quot;download&quot;&gt;文件下载1
+      &lt;s:param name=&quot;fileName&quot; value=&quot;%{&#39;file1.txt&#39;}&quot;&gt;&lt;/s:param&gt;
+  &lt;/s:a&gt;
+  &lt;a href=&quot;&lt;%= request.getContextPath()%&gt;/p/download.action?fileName=file1.txt&quot;&gt;2&lt;/a&gt;
+</code></pre></li></ul>
 
 </body>
 </html>
