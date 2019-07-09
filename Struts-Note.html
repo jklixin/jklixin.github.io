@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>MarkdownPad Document</title>
+<title>Note1</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
  /* reset
@@ -378,14 +378,50 @@ var wx ,wy;	$(document).mousemove(function(e){ wx = e.clientX; wy = e.clientY; }
 <ul>
 <li>Action访问Servlet-API </li></ul>
 <ol>
-<li>让Action类实现对应aweargan感知接口ServletRequestAwear,ServletresponseAwear,SessionAwear分别获取</li><li>通过ServletActionContext工具类</li><li><p>通过ActionContext类<br>获取Action的上下文对象ActionContext.getContext(),在ActionContext中把request,session,application三大作用域对象作为Map对象，通过Map对象即可获取</p>
-<pre><code> ActionContext context = ActionContext.getContext();
- HttpServletRequest request = getRequestCustomer(context);
- //获取session
- Map&lt;String,Object&gt; session = (Map&lt;string,Objext&gt;)context.get(ActionContext.SESSION);
- //获取参数列表
- HttpParameters parameters = context.getParameters();
- Parameter parameter = parameters.get(&quot;sid&quot;);
+<li><p>让Action类实现对应aweargan感知接口ServletRequestAwear,ServletresponseAwear,SessionAwear分别获取     </p>
+<pre><code>  public class TestAction implements ServletRequestAware,ServletResponseAware {
+  private HttpServletRequest request;
+  private HttpServletResponse response;
+  @Override
+  public void setServletResponse(HttpServletResponse response) {
+  this.response=response;
+  }
+
+  @Override
+  public void setServletRequest(HttpServletRequest request) {
+  this.request=request;
+  }   
+</code></pre><p>  }</p>
+</li><li><p>通过ServletActionContext工具类</p>
+<pre><code> public class TestAction {
+ public String getObject() {
+     HttpServletRequest request = ServletActionContext.getRequest();
+     HttpServletResponse response = ServletActionContext.getResponse();
+     HttpSession session = ServletActionContext.getRequest().getSession();
+     return null;
+     }
+ }
+</code></pre></li><li><p>通过ActionContext类<br>获取Action的上下文对象ActionContext.getContext(),在ActionContext中把request,session,application三大作用域对象作为Map对象，通过Map对象即可获取</p>
+<pre><code> import java.util.Map;
+
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+
+ import com.opensymphony.xwork2.ActionContext;
+
+ public class TestAction {
+
+     public String getObject() {
+         // ActionContext context = ActionContext.getContext();
+         // Map request = (Map)context.get(&quot;request&quot;);
+         // Map session = context.getSession();
+         HttpServletRequest request = (HttpServletRequest) ActionContext.getContext().get(org.apache.struts2.StrutsStatics.HTTP_REQUEST);
+         HttpServletResponse response = (HttpServletResponse) ActionContext.getContext().get(org.apache.struts2.StrutsStatics.HTTP_RESPONSE);
+         Map&lt;String, Object&gt; session = ActionContext.getContext().getSession();
+         session.put(&quot;USER-INFO&quot;, userName);//在session中保存
+         return NONE;
+     }
+ }
 </code></pre></li></ol>
 <hr>
 <h1 id="-">拦截器</h1>
