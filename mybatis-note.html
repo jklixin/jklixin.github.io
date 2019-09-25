@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mybatis整理笔记</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><p></p><div class="toc"><h3>mybatis整理笔记</h3><ul><li><a href="#mybatis_2">为什么需要用到mybatis</a></li><ul><li><a href="#1jdbc_3">1.原生jdbc所存在的问题</a></li><li><a href="#2_9">2.怎样解决上述问题</a></li></ul><li><a href="#mybatis_15">mybatis运行原理</a></li><li><a href="#_18">环境配置</a></li><ul><li><a href="#1mybatisxml_81">1.配置文件mybatis.xml详解</a></li><li><a href="#2_120">2.三种查询方式</a></li><ul><li><a href="#1_selectList_121">1. selectList()</a></li><li><a href="#2_selectOne_132">2. selectOne()</a></li><li><a href="#3_selectMap_140">3. selectMap()</a></li></ul><li><a href="#3_160">3.增，删，改</a></li><li><a href="#4parameterType__180">4..parameterType 属性</a></li><li><a href="#5_typeAliases__192">5. typeAliases 别名</a></li><ul><ul><ul><li><a href="#mybatisxml_193">第一步：mybatis.xml中定义别名，两种情况</a></li><ul><li><a href="#1_194">1.单个类定义别名</a></li><li><a href="#2_202">2.多个类定义别名</a></li></ul><li><a href="#mapperxml__peo__People__211">第二步：mapper.xml 中 peo 引用 People 类</a></li><ul><li><a href="#3mybatis_227">3.mybatis默认别名</a></li></ul></ul></ul></ul><li><a href="#6mybatis_232">6.mybatis接口绑定</a></li><ul><ul><ul><li><a href="#_233">作用:</a></li></ul></ul></ul><li><a href="#7_267">7.多参数传递</a></li></ul></ul></div><p></p>
+<h1><a id="mybatis_2"></a>为什么需要用到mybatis</h1>
+<h2><a id="1jdbc_3"></a>1.原生jdbc所存在的问题</h2>
+<ol>
+<li>数据库连接，使用时创建，不使用就关闭，对数据库进行<strong>频繁连接开启和关闭</strong>，造成数据库资源的浪费</li>
+<li>将sql 语句硬编码到Java代码中，如果<strong>sql语句修改</strong>，需要对java代码<strong>重新编译</strong>，不利于系统维护</li>
+<li>向preparedStatement中设置<strong>参数</strong>，对占位符位置和设置参数值，硬编码到Java文件中，不利于系统维护</li>
+<li>从resutSet中<strong>遍历结果集数据</strong>时，存在硬编码，将获取表的字段进行硬编码，不利于系统维护。</li>
+</ol>
+<h2><a id="2_9"></a>2.怎样解决上述问题</h2>
+<ol>
+<li>使用<strong>数据库连接池</strong>管理数据库连接</li>
+<li>将<strong>sql语句设置在xml配置文件</strong>中，即使sql变化，也无需重新编译</li>
+<li>将sql语句及占位符，<strong>参数全部配置在xml文件中</strong></li>
+<li>将查询的结果集，自动<strong>映射成java对象</strong></li>
+</ol>
+<h1><a id="mybatis_15"></a>mybatis运行原理</h1>
+<p><img src="https://img-blog.csdn.net/20180420191152719?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1NvbmdfSmlhbmdUYW8=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="Alt"></p>
+<h1><a id="_18"></a>环境配置</h1>
+<ul>
+<li>导入jar包</li>
+<li><code>src下新建mybatis.xml文件</code>.</li>
+</ul>
+<pre><code class="prism language-javascript"><span class="token operator">&lt;</span><span class="token operator">?</span>xml version<span class="token operator">=</span><span class="token string">"1.0"</span> encoding<span class="token operator">=</span><span class="token string">"UTF-8"</span> <span class="token operator">?</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token constant">DOCTYPE</span> configuration
+<span class="token constant">PUBLIC</span> <span class="token string">"-//mybatis.org//DTD Config 3.0//EN"</span>
+<span class="token string">"http://mybatis.org/dtd/mybatis-3-config.dtd"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>configuration<span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>定义别名，类名作别名 <span class="token operator">--</span><span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span>typeAliases<span class="token operator">&gt;</span>
+		<span class="token operator">&lt;</span><span class="token keyword">package</span> name<span class="token operator">=</span><span class="token string">"com.jun.mybatis.pojo"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">/</span>typeAliases<span class="token operator">&gt;</span> 
+
+	<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>定义数据源  <span class="token keyword">default</span>引用environment的id，当前使用的环境 <span class="token operator">--</span><span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span>environments <span class="token keyword">default</span><span class="token operator">=</span><span class="token string">"development"</span><span class="token operator">&gt;</span>
+			<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>声明开发环境节点，可以配置多个节点，id切换 <span class="token operator">--</span><span class="token operator">&gt;</span>
+		<span class="token operator">&lt;</span>environment id<span class="token operator">=</span><span class="token string">"development"</span><span class="token operator">&gt;</span>
+			<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> 事务管理 ：使用原生jdbc事务<span class="token operator">--</span><span class="token operator">&gt;</span>
+			<span class="token operator">&lt;</span>transactionManager type<span class="token operator">=</span><span class="token string">"JDBC"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> 数据源 <span class="token operator">--</span><span class="token operator">&gt;</span>
+			<span class="token operator">&lt;</span>dataSource type<span class="token operator">=</span><span class="token string">"POOLED"</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"driver"</span> value<span class="token operator">=</span><span class="token string">"com.mysql.jdbc.Driver"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"url"</span> value<span class="token operator">=</span><span class="token string">"jdbc:mysql://localhost:3306/mybatistest?chara       cterEncoding=UTF-8"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"username"</span> value<span class="token operator">=</span><span class="token string">"root"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"password"</span> value<span class="token operator">=</span><span class="token string">"admin"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+			<span class="token operator">&lt;</span><span class="token operator">/</span>dataSource<span class="token operator">&gt;</span>
+		<span class="token operator">&lt;</span><span class="token operator">/</span>environment<span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">/</span>environments<span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>映射文件 <span class="token operator">--</span><span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span>mappers<span class="token operator">&gt;</span>
+		 <span class="token operator">&lt;</span>mapper resource<span class="token operator">=</span><span class="token string">"com/jun/mybatis/pojo/teacherMapper.xml"</span><span class="token operator">/</span><span class="token operator">&gt;</span> 
+		<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> <span class="token operator">&lt;</span><span class="token keyword">package</span> name<span class="token operator">=</span><span class="token string">"com/jun/mybatis/mapper"</span> <span class="token operator">/</span><span class="token operator">&gt;</span> <span class="token operator">--</span><span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">/</span>mappers<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>configuration<span class="token operator">&gt;</span>
+
+</code></pre>
+<ul>
+<li>新建mapper结尾的包，在包下创建：<code>实体类名+Mapper.xml</code>文件</li>
+</ul>
+<pre><code class="prism language-javascript">
+<span class="token operator">&lt;</span><span class="token operator">?</span>xml version<span class="token operator">=</span><span class="token string">"1.0"</span> encoding<span class="token operator">=</span><span class="token string">"UTF-8"</span><span class="token operator">?</span><span class="token operator">&gt;</span> 
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token constant">DOCTYPE</span> mapper <span class="token constant">PUBLIC</span> <span class="token string">"-//mybatis.org//DTD Mapper 3.0//EN"</span> <span class="token string">"http://mybatis.org/dtd/mybatis-3-mapper.dtd"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> namesapce<span class="token punctuation">:</span><span class="token function">理解成实现类的全路径</span><span class="token punctuation">(</span>包名<span class="token operator">+</span>类名<span class="token punctuation">)</span> <span class="token operator">--</span><span class="token operator">&gt;</span>
+ <span class="token operator">&lt;</span>mapper namespace<span class="token operator">=</span><span class="token string">"a.b"</span> <span class="token operator">&gt;</span>
+	<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> id<span class="token punctuation">:</span>方法名 
+	 parameterType<span class="token punctuation">:</span>定义参数类型
+	 resultType<span class="token punctuation">:</span>返回值类型<span class="token punctuation">.</span>
+	 如果方法返回值是 list<span class="token punctuation">,</span>在 resultType 中写 List 的泛型<span class="token punctuation">,</span>
+	 因为 mybatis 对 jdbc 封装<span class="token punctuation">,</span>一行一行读取数据 <span class="token operator">--</span><span class="token operator">&gt;</span> 
+	<span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"selAll"</span> resultType<span class="token operator">=</span><span class="token string">"com.bjsxt.pojo.Flower"</span><span class="token operator">&gt;</span> 
+		select <span class="token operator">*</span> <span class="token keyword">from</span> flower 
+	<span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span> 
+
+	<span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"findById"</span> parameterType<span class="token operator">=</span><span class="token string">"int"</span> resultType<span class="token operator">=</span><span class="token string">"com.bjsxt.pojo.Flower"</span><span class="token operator">&gt;</span>
+	 select <span class="token operator">*</span> <span class="token keyword">from</span> flower where id<span class="token operator">=</span>#<span class="token punctuation">{</span><span class="token constant">VALUE</span> <span class="token punctuation">}</span>
+	  <span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span>
+
+<span class="token operator">&lt;</span><span class="token operator">/</span>mapper<span class="token operator">&gt;</span>
+
+</code></pre>
+<h2><a id="1mybatisxml_81"></a>1.配置文件mybatis.xml详解</h2>
+<blockquote>
+<p>将数据库连接的参数单独配置在，db.properties中，只需要在mybatis.xml中加载db.properties的属性值。就不需要对数据库连接参数硬编码。</p>
+<ul>
+<li>
+<p>好处：方便对参数进行统一管理，其它xml可以引用该db.properties</p>
+</li>
+<li>
+<p>特性： MyBatis 将按照下面的顺序来加载属性：<br>
+1.在 properties 元素体内定义的属性首先被读取。<br>
+2.读取properties 元素中resource或 url 加载的属性，它会覆盖已读取的同名属性。<br>
+3.读取parameterType传递的属性，它会覆盖已读取的同名属性。</p>
+</li>
+<li>
+<p>建议：</p>
+<p>不要在properties元素体内添加任何属性值，只将属性值定义在properties文件中。<br>
+在properties文件中定义属性名要有一定的特殊性，如XX.XX <code>(jdbc.url</code>)</p>
+</li>
+</ul>
+</blockquote>
+<ol>
+<li>src下建立db.properties文件</li>
+</ol>
+<pre><code class="prism language-java">jdbc<span class="token punctuation">.</span>driver<span class="token operator">=</span>com<span class="token punctuation">.</span>mysql<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span>Driver
+jdbc<span class="token punctuation">.</span>url <span class="token operator">=</span> jdbc<span class="token operator">:</span>mysql<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token operator">:</span><span class="token number">3306</span><span class="token operator">/</span>ssm
+jdbc<span class="token punctuation">.</span>username <span class="token operator">=</span> root
+jdbc<span class="token punctuation">.</span>password <span class="token operator">=</span> <span class="token number">0000</span>
+</code></pre>
+<ol start="2">
+<li>
+<p>加载db.properties文件,将<code>&lt;properties resource="db.properties/&gt;</code>添加到xml文件</p>
+</li>
+<li>
+<p>xml文件中改为</p>
+</li>
+</ol>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>dataSource type<span class="token operator">=</span><span class="token string">"POOLED"</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"driver"</span> value<span class="token operator">=</span><span class="token string">"${jdbc.driver}"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"url"</span> value<span class="token operator">=</span><span class="token string">"${jdbc.url}"</span><span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"username"</span> value<span class="token operator">=</span><span class="token string">"${jdbc.username}"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+				<span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"password"</span> value<span class="token operator">=</span><span class="token string">"${jdbc.password}"</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dataSource<span class="token operator">&gt;</span>
+</code></pre>
+<h2><a id="2_120"></a>2.三种查询方式</h2>
+<h3><a id="1_selectList_121"></a>1. selectList()</h3>
+<blockquote>
+<p>适用于查询结果都需要遍历的需求</p>
+</blockquote>
+<pre><code class="prism language-java">List<span class="token generics function"><span class="token punctuation">&lt;</span>Flower<span class="token punctuation">&gt;</span></span> list <span class="token operator">=</span> session<span class="token punctuation">.</span><span class="token function">selectList</span><span class="token punctuation">(</span><span class="token string">"a.b.selAll"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span>Flower flower <span class="token operator">:</span> list<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	 System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>flower<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+ <span class="token punctuation">}</span>
+</code></pre>
+<h3><a id="2_selectOne_132"></a>2. selectOne()</h3>
+<blockquote>
+<p>适用于返回结果只是变量或一行数据时</p>
+</blockquote>
+<pre><code class="prism language-java"><span class="token keyword">int</span> count <span class="token operator">=</span> session<span class="token punctuation">.</span><span class="token function">selectOne</span><span class="token punctuation">(</span><span class="token string">"a.b.selById"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3><a id="3_selectMap_140"></a>3. selectMap()</h3>
+<blockquote>
+<p>适用于需要在查询结果中通过某列的值取到这行数据的需求.<br>
+<code>Map&lt;key,resultType 控制&gt;</code></p>
+</blockquote>
+<p>xml文件：</p>
+<pre><code class="prism language-java">
+<span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"listTeachers2"</span> resultType<span class="token operator">=</span><span class="token string">"Teacher"</span><span class="token operator">&gt;</span>
+	select <span class="token operator">*</span> from teacher
+<span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span>
+</code></pre>
+<p>测试类：</p>
+<pre><code class="prism language-java">Map<span class="token generics function"><span class="token punctuation">&lt;</span>Object<span class="token punctuation">,</span> Object<span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> session<span class="token punctuation">.</span><span class="token function">selectMap</span><span class="token punctuation">(</span><span class="token string">"listTeachers2"</span><span class="token punctuation">,</span> <span class="token string">"teacher_name"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>map<span class="token punctuation">)</span><span class="token punctuation">;</span>
+Map<span class="token generics function"><span class="token punctuation">&lt;</span>k<span class="token punctuation">,</span>v<span class="token punctuation">&gt;</span></span><span class="token operator">:</span>k：<span class="token string">"teacher_name"</span>   V由resultType<span class="token operator">=</span><span class="token string">"Teacher"</span>控制
+
+</code></pre>
+<h2><a id="3_160"></a>3.增，删，改</h2>
+<blockquote>
+<p>在 mapper.xml 提供<code>&lt;delete&gt;</code>, <code>&lt;update&gt;</code>,<code>&lt;insert&gt;</code>标签</p>
+</blockquote>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>delete id<span class="token operator">=</span><span class="token string">"del"</span> parameterType<span class="token operator">=</span><span class="token string">"int"</span><span class="token operator">&gt;</span> 
+	delete from people where id <span class="token operator">=</span> #<span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>delete<span class="token operator">&gt;</span>
+</code></pre>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>update id<span class="token operator">=</span><span class="token string">"upd"</span> parameterType<span class="token operator">=</span><span class="token string">"People"</span><span class="token operator">&gt;</span>
+	 update people set name <span class="token operator">=</span> #<span class="token punctuation">{</span>name<span class="token punctuation">}</span> where id <span class="token operator">=</span> #<span class="token punctuation">{</span>id<span class="token punctuation">}</span> 
+<span class="token operator">&lt;</span><span class="token operator">/</span>update<span class="token operator">&gt;</span>
+</code></pre>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>insert id<span class="token operator">=</span><span class="token string">"ins"</span> parameterType<span class="token operator">=</span><span class="token string">"People"</span><span class="token operator">&gt;</span>
+	 insert into people <span class="token function">values</span><span class="token punctuation">(</span><span class="token keyword">default</span><span class="token punctuation">,</span>#<span class="token punctuation">{</span>name<span class="token punctuation">}</span><span class="token punctuation">,</span>#<span class="token punctuation">{</span>age<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>insert<span class="token operator">&gt;</span>
+
+</code></pre>
+<h2><a id="4parameterType__180"></a>4…parameterType 属性</h2>
+<p><img src="https://img-blog.csdnimg.cn/201909252034200.png" alt="在这里插入图片描述"><br>
+<img src="https://img-blog.csdnimg.cn/20190925203502887.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzcyMzA3OA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"selById"</span> resultType<span class="token operator">=</span><span class="token string">"com.bjsxt.pojo.People"</span> parameterType<span class="token operator">=</span><span class="token string">"int"</span><span class="token operator">&gt;</span> 
+	select <span class="token operator">*</span> from people where id<span class="token operator">=</span>#<span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span>
+
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/20190925203651754.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzcyMzA3OA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2><a id="5_typeAliases__192"></a>5. typeAliases 别名</h2>
+<h5><a id="mybatisxml_193"></a>第一步：mybatis.xml中定义别名，两种情况</h5>
+<h6><a id="1_194"></a>1.单个类定义别名</h6>
+<p>(type:类路径，alias:别名)</p>
+<pre><code class="prism language-java"><span class="token generics function"><span class="token punctuation">&lt;</span>typeAliases<span class="token punctuation">&gt;</span></span> 
+	<span class="token operator">&lt;</span>typeAlias type<span class="token operator">=</span><span class="token string">"com.bjsxt.pojo.People"</span> alias<span class="token operator">=</span><span class="token string">"peo"</span><span class="token operator">/</span><span class="token operator">&gt;</span> 
+<span class="token operator">&lt;</span><span class="token operator">/</span>typeAliases<span class="token operator">&gt;</span>
+</code></pre>
+<h6><a id="2_202"></a>2.多个类定义别名</h6>
+<p>(以下就是给pojo下所有类定义别名，别名就是类名)不用区分大小写</p>
+<pre><code class="prism language-java"><span class="token generics function"><span class="token punctuation">&lt;</span>typeAliases<span class="token punctuation">&gt;</span></span> 
+	<span class="token operator">&lt;</span>typeAlias type<span class="token operator">=</span><span class="token string">"com.bjsxt.pojo"</span><span class="token operator">/</span><span class="token operator">&gt;</span> 
+<span class="token operator">&lt;</span><span class="token operator">/</span>typeAliases<span class="token operator">&gt;</span>
+</code></pre>
+<h5><a id="mapperxml__peo__People__211"></a>第二步：mapper.xml 中 peo 引用 People 类</h5>
+<p>单个类别名：此处不用<code>com.bjsxt.pojo.People</code>而是直接使用别名peo</p>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"page"</span> resultType<span class="token operator">=</span><span class="token string">"peo"</span> parameterType<span class="token operator">=</span><span class="token string">"map"</span><span class="token operator">&gt;</span> 
+	select <span class="token operator">*</span> from people limit #<span class="token punctuation">{</span>pageStart<span class="token punctuation">}</span><span class="token punctuation">,</span>#<span class="token punctuation">{</span>pageSize<span class="token punctuation">}</span>
+ <span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span>
+
+</code></pre>
+<p>多个类别名：</p>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"page"</span> resultType<span class="token operator">=</span><span class="token string">"People"</span> parameterType<span class="token operator">=</span><span class="token string">"map"</span><span class="token operator">&gt;</span>
+	select <span class="token operator">*</span> from people limit #<span class="token punctuation">{</span>pageStart<span class="token punctuation">}</span><span class="token punctuation">,</span>#<span class="token punctuation">{</span>pageSize<span class="token punctuation">}</span>
+ <span class="token operator">&lt;</span><span class="token operator">/</span>select
+</code></pre>
+<h6><a id="3mybatis_227"></a>3.mybatis默认别名</h6>
+<blockquote>
+<p>默认别名就是给小写字母前面下划线<code>_</code>或者大写变小写，如：<code>Integer---&gt;int或者integer</code></p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20190925205306262.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzcyMzA3OA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2><a id="6mybatis_232"></a>6.mybatis接口绑定</h2>
+<h5><a id="_233"></a>作用:</h5>
+<p>实现创建一个接口后把mapper.xml由mybatis生成接口的实现类,通过调用接口对象就可以获取 mapper.xml 中编写的 sql.</p>
+<ol>
+<li>创建一个接口</li>
+</ol>
+<p><strong>接口包名和接口名与 mapper.xml 中namespace相同<br>
+接口中方法名和 mapper.xml 标签的 id 属性相同</strong></p>
+<pre><code class="prism language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">LogMapper</span> <span class="token punctuation">{</span>
+	 List<span class="token generics function"><span class="token punctuation">&lt;</span>Log<span class="token punctuation">&gt;</span></span> <span class="token function">selAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+
+</code></pre>
+<ol start="2">
+<li>使用进行扫描接口和 mapper.xml</li>
+</ol>
+<pre><code class="prism language-java"><span class="token generics function"><span class="token punctuation">&lt;</span>mappers<span class="token punctuation">&gt;</span></span>
+	<span class="token operator">&lt;</span><span class="token keyword">package</span> name<span class="token operator">=</span><span class="token string">"com.bjsxt.mapper"</span><span class="token operator">/</span><span class="token operator">&gt;</span> 
+<span class="token operator">&lt;</span><span class="token operator">/</span>mappers<span class="token operator">&gt;</span>
+</code></pre>
+<ol start="3">
+<li>在 com.bjsxt.mapper 新建一个 LogMapper.xml<br>
+<strong>namespace 必须和接口全限定路径(包名+类名)一致<br>
+id 值必须和接口中方法名相同</strong></li>
+</ol>
+<pre><code class="prism language-java"><span class="token operator">&lt;</span>mapper namespace<span class="token operator">=</span><span class="token string">"com.bjsxt.mapper.LogMapper"</span><span class="token operator">&gt;</span> 
+	<span class="token operator">&lt;</span>select id<span class="token operator">=</span><span class="token string">"selAll"</span> resultType<span class="token operator">=</span><span class="token string">"log"</span><span class="token operator">&gt;</span> 
+		select <span class="token operator">*</span> from log <span class="token operator">&lt;</span><span class="token operator">/</span>select<span class="token operator">&gt;</span> 
+<span class="token operator">&lt;</span><span class="token operator">/</span>mapper<span class="token operator">&gt;</span>
+</code></pre>
+<h2><a id="7_267"></a>7.多参数传递</h2>
+<ol>
+<li></li>
+</ol>
+</div>
+</body>
+
+</html>
